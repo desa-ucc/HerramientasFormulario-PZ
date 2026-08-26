@@ -1,0 +1,68 @@
+version: '3.8'
+
+# Regla: Redes y Nombres Explícitos
+networks:
+  portal_net:
+    driver: bridge
+    name: portal_internal_net
+
+services:
+  # ========================================================
+  # SERVICIO: Base de Datos (SQL Server)
+  # ========================================================
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    # Nombre explícito del contenedor
+    container_name: portal_db
+    # Inyectar variables desde .env (Nunca hardcodear)
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${DB_SA_PASSWORD}
+      TZ: America/Costa_Rica
+    ports:
+      - "${DB_PORT}:1433"
+    # Mapeo del script de inicialización
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - portal_net
+    # Regla: Healthchecks sin Curl
+    # Usamos una herramienta nativa (sqlcmd) para probar que el puerto y DB responden
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"${DB_SA_PASSWORD}\" -C -Q \"SELECT 1\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ========================================================
+  # SERVICIO: Frontend (Angular + Nginx)
+  # ========================================================
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Pasamos las variables requeridas por la etapa 1 (cloner)
+      args:
+        GIT_REPO: "local"
+        GIT_USER: "local"
+        GIT_TOKEN: "local"
+    # Nombre explícito del contenedor
+    container_name: portal_frontend
+    ports:
+      - "${FRONTEND_PORT}:8080"
+    networks:
+      - portal_net
+    # Regla: Dependencias Estrictas
+    # El frontend espera a que la BD esté saludable (aunque no se comuniquen directamente, asegura el orden del stack)
+    depends_on:
+      database:
+        condition: service_healthy
+    # Regla: Healthchecks sin Curl
+    # Como quitamos wget/curl en el Dockerfile, verificamos a nivel TCP usando busybox nc
+    # Nginx en alpine no tiene bash, así que probamos que el proceso escuche en el puerto.
+    healthcheck:
+      test: ["CMD-SHELL", "netstat -ln | grep 8080"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
