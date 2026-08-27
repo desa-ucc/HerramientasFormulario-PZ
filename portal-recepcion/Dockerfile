@@ -58,10 +58,9 @@ RUN apk add --no-cache tzdata && \
     mkdir -p /var/cache/nginx /var/run /var/log/nginx && \
     chown -R nginxuser:nginxgroup /var/cache/nginx /var/run /var/log/nginx /etc/nginx/conf.d /usr/share/nginx/html /tmp
 
-# Copiar configuración de Nginx (cambiando el puerto 80 a uno sin privilegios como 8080 y ajustando el pid)
-# Inyectamos el pid /tmp/nginx.pid; explícitamente en el nginx.conf (nivel principal)
-# y configuramos el default.conf
-RUN sed -i 's/pid.*\/var\/run\/nginx.pid;/pid \/tmp\/nginx.pid;/' /etc/nginx/nginx.conf && \
+# Reescribimos completamente el nginx.conf para forzar la ruta del PID
+# y configuramos el default.conf para escuchar en el puerto 8080.
+RUN echo -e "worker_processes auto;\npid /tmp/nginx.pid;\nevents { worker_connections 1024; }\nhttp { include /etc/nginx/mime.types; default_type application/octet-stream; include /etc/nginx/conf.d/*.conf; }" > /etc/nginx/nginx.conf && \
     echo "server { \
     listen 8080; \
     server_name localhost; \
@@ -71,7 +70,7 @@ RUN sed -i 's/pid.*\/var\/run\/nginx.pid;/pid \/tmp\/nginx.pid;/' /etc/nginx/ngi
         try_files \$uri \$uri/ /index.html; \
     } \
 }" > /etc/nginx/conf.d/default.conf && \
-chown nginxuser:nginxgroup /etc/nginx/conf.d/default.conf /etc/nginx/nginx.conf
+    chown nginxuser:nginxgroup /etc/nginx/conf.d/default.conf /etc/nginx/nginx.conf
 
 # Copiar los archivos compilados de Angular desde la etapa 2 (builder)
 COPY --from=builder --chown=nginxuser:nginxgroup /app/dist/frontend /usr/share/nginx/html
