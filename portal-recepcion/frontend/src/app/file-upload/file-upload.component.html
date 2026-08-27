@@ -1,102 +1,92 @@
 <div class="page-container">
+
   <div class="card-container">
 
-    <div class="card-header">
-      <div class="header-content">
-        <h1>Portal de Recepción de Documentos</h1>
-        <p class="subtitle">Complete su información personal y adjunte los documentos requeridos.</p>
+    <!-- Estado: Enlace Inválido -->
+    <ng-container *ngIf="isInvalidLink">
+      <div class="invalid-link-message">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-error"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        <h2>Enlace de solicitud inválido.</h2>
+        <p>Por favor, utilice el enlace proporcionado en el formulario.</p>
       </div>
-    </div>
+    </ng-container>
 
-    <div class="card-body">
-      <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
+    <!-- Estado: Formulario Activo -->
+    <ng-container *ngIf="!isInvalidLink && currentDoc">
+      <div class="card-header">
+        <p class="subtitle">Automatización Certificaciones Constancias PZ está solicitando archivos para</p>
+        <h1 class="title">{{ currentDoc.title }}</h1>
+      </div>
 
-        <!-- Sección de Datos Personales -->
-        <section class="form-section">
-          <h2 class="section-title">Datos Personales</h2>
-          <div class="input-row">
-            <div class="input-group">
-              <label for="nombre">Nombre</label>
-              <input type="text" id="nombre" formControlName="nombre" class="modern-input" placeholder="Ingrese su nombre">
-              <span class="validation-msg" *ngIf="uploadForm.get('nombre')?.invalid && uploadForm.get('nombre')?.touched">
-                El nombre es requerido
-              </span>
-            </div>
-            <div class="input-group">
-              <label for="apellidos">Apellidos</label>
-              <input type="text" id="apellidos" formControlName="apellidos" class="modern-input" placeholder="Ingrese sus apellidos">
-              <span class="validation-msg" *ngIf="uploadForm.get('apellidos')?.invalid && uploadForm.get('apellidos')?.touched">
-                Los apellidos son requeridos
-              </span>
-            </div>
-          </div>
-        </section>
+      <div class="card-body">
+        <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
 
-        <!-- Sección de Documentos -->
-        <section class="form-section">
-          <h2 class="section-title">Documentos Requeridos</h2>
-          <p class="section-desc">Seleccione y adjunte los archivos correspondientes en formato PDF o Imagen.</p>
-
-          <div class="document-list">
-            <div class="document-row" *ngFor="let doc of documentosList; let i = index" [class.has-file]="doc.file">
-              <div class="doc-info">
-                <span class="doc-label">{{ doc.label }}</span>
-                <span class="doc-name" *ngIf="doc.file">{{ doc.file.name }}</span>
-              </div>
-
-              <div class="doc-actions">
-                <!-- Estado sin archivo: Botón Adjuntar -->
-                <ng-container *ngIf="!doc.file">
-                  <label [for]="'file_' + i" class="btn-attach">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
-                    Adjuntar
-                  </label>
-                  <input type="file" [id]="'file_' + i" class="hidden-input" (change)="onFileSelected($event, i)" accept=".pdf,.jpg,.jpeg,.png">
-                </ng-container>
-
-                <!-- Estado con archivo: Confirmación y Remover -->
-                <ng-container *ngIf="doc.file">
-                  <div class="status-success-badge">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Cargado
-                  </div>
-                  <button type="button" class="btn-icon btn-remove" (click)="removeFile(i)" title="Eliminar archivo">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                  </button>
-                </ng-container>
-              </div>
-            </div>
-          </div>
-          <span class="validation-msg" *ngIf="!hasAnyFile && uploadForm.touched">
-            Debe adjuntar al menos un documento.
-          </span>
-        </section>
-
-        <!-- Feedback de Envío General -->
-        <div class="feedback-area">
-          <div *ngIf="uploadStatus === 'success'" class="alert alert-success fade-in">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            Los documentos han sido enviados correctamente.
-          </div>
-
-          <div *ngIf="uploadStatus === 'error'" class="alert alert-error fade-in">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-            Ocurrió un error en la conexión. Por favor intente nuevamente.
-          </div>
-        </div>
-
-        <!-- Botón de Envío -->
-        <div class="card-footer">
-          <button type="submit" class="btn-primary" [disabled]="uploadForm.invalid || !hasAnyFile || uploadStatus === 'uploading'" [class.is-loading]="uploadStatus === 'uploading'">
-            <span class="btn-text" *ngIf="uploadStatus !== 'uploading'">Enviar Documentos</span>
-            <span class="btn-text" *ngIf="uploadStatus === 'uploading'">
-              <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>
-              Enviando...
+          <div class="form-group">
+            <label for="nombre">Nombre *</label>
+            <input type="text" id="nombre" formControlName="nombre" class="form-control" placeholder="Ej. Juan" [class.is-invalid]="uploadForm.get('nombre')?.invalid && uploadForm.get('nombre')?.touched">
+            <span class="validation-msg" *ngIf="uploadForm.get('nombre')?.invalid && uploadForm.get('nombre')?.touched">
+              El nombre es requerido
             </span>
-          </button>
-        </div>
+          </div>
 
-      </form>
-    </div>
+          <div class="form-group">
+            <label for="apellidos">Apellidos *</label>
+            <input type="text" id="apellidos" formControlName="apellidos" class="form-control" placeholder="Ej. Pérez Gómez" [class.is-invalid]="uploadForm.get('apellidos')?.invalid && uploadForm.get('apellidos')?.touched">
+            <span class="validation-msg" *ngIf="uploadForm.get('apellidos')?.invalid && uploadForm.get('apellidos')?.touched">
+              Los apellidos son requeridos
+            </span>
+          </div>
+
+          <div class="form-group upload-section">
+            <label>Archivo adjunto *</label>
+
+            <div class="file-drop-area" *ngIf="!selectedFile">
+              <label for="fileInput" class="file-label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="upload-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <span class="file-text">Seleccionar archivo</span>
+                <span class="file-formats">Soporta PDF, JPG, PNG</span>
+              </label>
+              <input type="file" id="fileInput" class="hidden-input" (change)="onFileSelected($event)" accept=".pdf,.jpg,.jpeg,.png">
+            </div>
+
+            <div class="selected-file-info" *ngIf="selectedFile">
+              <div class="file-details">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="doc-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span class="file-name" [title]="selectedFile.name">{{ selectedFile.name }}</span>
+                <button type="button" class="btn-remove" (click)="removeFile()" title="Remover archivo">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+            </div>
+
+            <span class="validation-msg" *ngIf="!selectedFile && uploadForm.touched">
+              Debe adjuntar el documento requerido.
+            </span>
+          </div>
+
+          <!-- Feedback Mensajes -->
+          <div class="feedback-area">
+            <div *ngIf="uploadStatus === 'success'" class="alert alert-success fade-in">
+              ¡Archivo enviado exitosamente!
+            </div>
+            <div *ngIf="uploadStatus === 'error'" class="alert alert-error fade-in">
+              Ocurrió un error. Por favor intente nuevamente.
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <button type="submit" class="btn-primary" [disabled]="uploadForm.invalid || !selectedFile || uploadStatus === 'uploading'" [class.is-loading]="uploadStatus === 'uploading'">
+              <span *ngIf="uploadStatus !== 'uploading'">Cargar</span>
+              <span *ngIf="uploadStatus === 'uploading'" class="loading-state">
+                <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>
+                Cargando...
+              </span>
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </ng-container>
+
   </div>
 </div>

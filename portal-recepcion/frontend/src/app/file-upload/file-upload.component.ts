@@ -3,23 +3,53 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { FileUploadService } from './file-upload.service';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
 
-export interface DocumentConfig {
+export interface DocConfig {
   key: string;
-  label: string;
+  fileKey: string;
+  title: string;
   url: string;
-  file: File | null;
 }
 
-const ALL_DOCUMENTS: DocumentConfig[] = [
-  { key: 'doc_cedula', label: 'Cédula por ambos lados', url: 'http://localhost:5678/webhook/cedula', file: null },
-  { key: 'doc_bachi_media', label: 'Título de Bachillerato en Educación Media', url: 'http://localhost:5678/webhook/bachi-media', file: null },
-  { key: 'doc_bachi_uni', label: 'Título de Bachillerato Universitario', url: 'http://localhost:5678/webhook/bachi-uni', file: null },
-  { key: 'doc_licenciatura', label: 'Título de Licenciatura', url: 'http://localhost:5678/webhook/licenciatura', file: null },
-  { key: 'doc_maestria', label: 'Título de Maestría', url: 'http://localhost:5678/webhook/maestria', file: null },
-  { key: 'doc_comprobante', label: 'Comprobante de pago del documento', url: 'http://localhost:5678/webhook/comprobante', file: null }
-];
+// Diccionario de configuración de documentos
+const DOC_DICTIONARY: { [key: string]: DocConfig } = {
+  'cedula': {
+    key: 'cedula',
+    fileKey: 'doc_cedula',
+    title: 'Cédula por ambos lados',
+    url: 'http://localhost:5678/webhook/cedula'
+  },
+  'bachi_media': {
+    key: 'bachi_media',
+    fileKey: 'doc_bachi_media',
+    title: 'Título de Bachillerato en Educación Media',
+    url: 'http://localhost:5678/webhook/bachi-media'
+  },
+  'bachi_uni': {
+    key: 'bachi_uni',
+    fileKey: 'doc_bachi_uni',
+    title: 'Título de Bachillerato Universitario',
+    url: 'http://localhost:5678/webhook/bachi-uni'
+  },
+  'licenciatura': {
+    key: 'licenciatura',
+    fileKey: 'doc_licenciatura',
+    title: 'Título de Licenciatura',
+    url: 'http://localhost:5678/webhook/licenciatura'
+  },
+  'maestria': {
+    key: 'maestria',
+    fileKey: 'doc_maestria',
+    title: 'Título de Maestría',
+    url: 'http://localhost:5678/webhook/maestria'
+  },
+  'comprobante': {
+    key: 'comprobante',
+    fileKey: 'doc_comprobante',
+    title: 'Comprobante de pago del documento',
+    url: 'http://localhost:5678/webhook/comprobante'
+  }
+};
 
 @Component({
   selector: 'app-root',
@@ -31,7 +61,10 @@ const ALL_DOCUMENTS: DocumentConfig[] = [
 export class FileUploadComponent implements OnInit {
   uploadForm: FormGroup;
   uploadStatus: 'idle' | 'uploading' | 'success' | 'error' = 'idle';
-  documentosList: DocumentConfig[] = [];
+
+  currentDoc: DocConfig | null = null;
+  selectedFile: File | null = null;
+  isInvalidLink: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -45,80 +78,68 @@ export class FileUploadComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Leemos los query params para el renderizado dinámico
+    // Leemos el parámetro ?doc= de la URL
     this.route.queryParams.subscribe(params => {
-      const reqParam = params['req'];
+      const docParam = params['doc'];
 
-      // Creamos copias profundas de la configuración base para no mutarla accidentalmente
-      const allDocs = ALL_DOCUMENTS.map(doc => ({ ...doc }));
-
-      if (reqParam) {
-        // Ejemplo de URL: ?req=cedula,maestria
-        const requestedKeys = reqParam.split(',').map((k: string) => k.trim().toLowerCase());
-        this.documentosList = allDocs.filter(doc =>
-          requestedKeys.some((reqKey: string) => doc.key.toLowerCase().includes(reqKey))
-        );
-
-        // Fallback: si se manda basura en req, mostramos todos
-        if (this.documentosList.length === 0) {
-          this.documentosList = allDocs;
-        }
+      if (docParam && DOC_DICTIONARY[docParam.toLowerCase()]) {
+        this.currentDoc = DOC_DICTIONARY[docParam.toLowerCase()];
+        this.isInvalidLink = false;
       } else {
-        // Sin query param, mostramos todos los documentos
-        this.documentosList = allDocs;
+        this.currentDoc = null;
+        this.isInvalidLink = true;
       }
     });
   }
 
-  onFileSelected(event: Event, index: number): void {
+  onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.documentosList[index].file = input.files[0];
+      this.selectedFile = input.files[0];
+    } else {
+      this.selectedFile = null;
     }
   }
 
-  removeFile(index: number): void {
-    this.documentosList[index].file = null;
-  }
-
-  get hasAnyFile(): boolean {
-    return this.documentosList.some(doc => doc.file !== null);
+  removeFile(): void {
+    this.selectedFile = null;
+    // Si queremos reiniciar también el input HTML de forma reactiva (opcional):
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
   }
 
   resetForm(): void {
     this.uploadForm.reset();
-    this.documentosList.forEach(doc => doc.file = null);
+    this.removeFile();
     this.uploadStatus = 'idle';
   }
 
-  async onSubmit(): Promise<void> {
-    if (this.uploadForm.valid && this.hasAnyFile) {
+  onSubmit(): void {
+    if (this.uploadForm.valid && this.selectedFile && this.currentDoc) {
       this.uploadStatus = 'uploading';
       const { nombre, apellidos } = this.uploadForm.value;
 
-      // Construimos el array de peticiones de manera independiente
-      const uploadPromises = this.documentosList
-        .filter(doc => doc.file !== null)
-        .map(doc => {
-          return firstValueFrom(
-            this.fileUploadService.uploadSingleFile(doc.url, doc.file!, doc.key, nombre, apellidos)
-          );
-        });
-
-      try {
-        // Usamos Promise.all para manejar subidas simultáneas
-        await Promise.all(uploadPromises);
-        this.uploadStatus = 'success';
-        setTimeout(() => {
-          this.resetForm();
-        }, 4000);
-      } catch (err) {
-        console.error('Error al subir los archivos:', err);
-        this.uploadStatus = 'error';
-        setTimeout(() => {
-          this.uploadStatus = 'idle';
-        }, 5000);
-      }
+      this.fileUploadService.uploadSingleFile(
+        this.currentDoc.url,
+        this.selectedFile,
+        this.currentDoc.fileKey,
+        nombre,
+        apellidos
+      ).subscribe({
+        next: () => {
+          this.uploadStatus = 'success';
+          setTimeout(() => {
+            this.resetForm();
+          }, 4000);
+        },
+        error: (err) => {
+          console.error('Error al subir el archivo:', err);
+          this.uploadStatus = 'error';
+          setTimeout(() => {
+            this.uploadStatus = 'idle';
+          }, 5000);
+        }
+      });
     } else {
       this.uploadForm.markAllAsTouched();
     }
