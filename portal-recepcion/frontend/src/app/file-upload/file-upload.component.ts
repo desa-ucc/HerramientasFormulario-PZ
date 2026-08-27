@@ -11,43 +11,46 @@ export interface DocConfig {
   url: string;
 }
 
-// Diccionario de configuración de documentos
+// URL maestra de Power Automate
+const baseUrl = 'https://defaultf86f8805ad1443439a0edc1c0ff7a4.31.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/01/workflows/9f05005def66407699c8ce85fe91e5dc/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=aczxmthnBdgWmaVGuIOEXh9ZNSqU-1m-eCrLe-axK8w';
+
+// Diccionario de configuración de documentos unificado
 const DOC_DICTIONARY: { [key: string]: DocConfig } = {
   'cedula': {
     key: 'cedula',
     fileKey: 'doc_cedula',
     title: 'Cédula por ambos lados',
-    url: 'http://sys.castrocarazo.app/webhook-test/recepcion-documentos'
+    url: `${baseUrl}&tipo=cedula`
   },
   'bachi_media': {
     key: 'bachi_media',
     fileKey: 'doc_bachi_media',
     title: 'Título de Bachillerato en Educación Media',
-    url: 'http://localhost:5678/webhook/bachi-media'
+    url: `${baseUrl}&tipo=bachi_media`
   },
   'bachi_uni': {
     key: 'bachi_uni',
     fileKey: 'doc_bachi_uni',
     title: 'Título de Bachillerato Universitario',
-    url: 'http://localhost:5678/webhook/bachi-uni'
+    url: `${baseUrl}&tipo=bachi_uni`
   },
   'licenciatura': {
     key: 'licenciatura',
     fileKey: 'doc_licenciatura',
     title: 'Título de Licenciatura',
-    url: 'http://localhost:5678/webhook/licenciatura'
+    url: `${baseUrl}&tipo=licenciatura`
   },
   'maestria': {
     key: 'maestria',
     fileKey: 'doc_maestria',
     title: 'Título de Maestría',
-    url: 'http://localhost:5678/webhook/maestria'
+    url: `${baseUrl}&tipo=maestria`
   },
   'comprobante': {
     key: 'comprobante',
     fileKey: 'doc_comprobante',
     title: 'Comprobante de pago del documento',
-    url: 'http://localhost:5678/webhook/comprobante'
+    url: `${baseUrl}&tipo=comprobante`
   }
 };
 
@@ -78,7 +81,6 @@ export class FileUploadComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Leemos el parámetro ?doc= de la URL
     this.route.queryParams.subscribe(params => {
       const docParam = params['doc'];
 
@@ -103,7 +105,6 @@ export class FileUploadComponent implements OnInit {
 
   removeFile(): void {
     this.selectedFile = null;
-    // Si queremos reiniciar también el input HTML de forma reactiva (opcional):
     const fileInput = document.getElementById('fileInput') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
   }
