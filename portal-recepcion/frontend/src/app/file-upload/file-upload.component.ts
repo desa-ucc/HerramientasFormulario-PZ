@@ -17,7 +17,7 @@ const DOC_DICTIONARY: { [key: string]: DocConfig } = {
     key: 'cedula',
     fileKey: 'doc_cedula',
     title: 'Cédula por ambos lados',
-    url: 'http://localhost:5678/webhook/cedula'
+    url: 'http://sys.castrocarazo.app/webhook-test/recepcion-documentos'
   },
   'bachi_media': {
     key: 'bachi_media',
