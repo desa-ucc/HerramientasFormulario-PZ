@@ -3,29 +3,39 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export interface DocumentosUpload {
+  doc_cedula?: File;
+  doc_bachi_media?: File;
+  doc_bachi_uni?: File;
+  doc_licenciatura?: File;
+  doc_maestria?: File;
+  doc_comprobante?: File;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class FileUploadService {
-
-  // URL del Webhook inyectada mediante variables de entorno (Angular enviroments)
   private webhookUrl = environment.webhookUrl;
 
   constructor(private http: HttpClient) { }
 
   /**
-   * Envía los datos del formulario y el archivo al webhook de n8n.
-   * @param file El archivo seleccionado por el usuario.
-   * @param nombre Nombre del usuario.
-   * @param apellidos Apellidos del usuario.
+   * Envía los datos personales y los múltiples archivos al webhook de n8n.
    */
-  uploadFile(file: File, nombre: string, apellidos: string): Observable<any> {
+  uploadFiles(nombre: string, apellidos: string, documentos: DocumentosUpload): Observable<any> {
     const formData = new FormData();
-    formData.append('file', file);
     formData.append('nombre', nombre);
     formData.append('apellidos', apellidos);
 
-    // Hacemos el POST al Webhook
+    // Iteramos sobre las claves exactas requeridas para n8n
+    if (documentos.doc_cedula) formData.append('doc_cedula', documentos.doc_cedula);
+    if (documentos.doc_bachi_media) formData.append('doc_bachi_media', documentos.doc_bachi_media);
+    if (documentos.doc_bachi_uni) formData.append('doc_bachi_uni', documentos.doc_bachi_uni);
+    if (documentos.doc_licenciatura) formData.append('doc_licenciatura', documentos.doc_licenciatura);
+    if (documentos.doc_maestria) formData.append('doc_maestria', documentos.doc_maestria);
+    if (documentos.doc_comprobante) formData.append('doc_comprobante', documentos.doc_comprobante);
+
     return this.http.post(this.webhookUrl, formData);
   }
 }

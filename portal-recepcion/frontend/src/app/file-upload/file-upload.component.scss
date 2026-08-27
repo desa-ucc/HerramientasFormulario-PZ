@@ -1,214 +1,362 @@
-// Paleta estricta de colores
-$color-primary-dark: #004F59; // Teal oscuro
-$color-primary-light: #009a96; // Teal claro
-$color-primary-green: #78BE21; // Verde
+// UX/UI Premium - Paleta Institucional
+$color-primary-dark: #004F59;
+$color-primary-light: #009a96;
+$color-primary-green: #78BE21;
+$color-bg-page: #f8fafc; // Un fondo más limpio y moderno
+$color-surface: #ffffff;
+$color-text-main: #1e293b;
+$color-text-muted: #64748b;
+$color-border: #e2e8f0;
+$color-border-hover: #cbd5e1;
+$color-error: #ef4444;
+$color-error-bg: #fef2f2;
+$color-success-bg: #f0fdf4;
 
-$color-secondary-red: #F8485E; // Rojo
-$color-secondary-orange: #F68D2E; // Naranja
-$color-secondary-blue: #004C97; // Azul
-$color-secondary-purple: #702082; // Morado
+// Reset básico para el componente
+* { box-sizing: border-box; }
 
-$color-bg-light: #f3f2f1; // Fondo gris claro (UX)
-$color-white: #ffffff;
-$color-text-dark: #323130;
-$color-text-light: #605e5c;
-$color-border: #edebe9;
-
-.container {
+.page-container {
+  min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: $color-bg-light;
-  padding: 20px;
-}
-
-.card {
-  background-color: $color-white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 500px;
-  overflow: hidden;
-}
-
-.header {
-  padding: 24px 24px 16px;
-  border-bottom: 1px solid $color-border;
-
-  h2 {
-    margin: 0 0 8px 0;
-    color: $color-text-dark;
-    font-size: 24px;
-    font-weight: 600;
-  }
-
-  .subtitle {
-    margin: 0;
-    color: $color-text-light;
-    font-size: 14px;
-  }
-}
-
-.form-body {
-  padding: 24px;
-}
-
-.file-drop-area {
-  border: 2px dashed $color-primary-light;
-  border-radius: 6px;
+  align-items: flex-start;
   padding: 40px 20px;
-  text-align: center;
-  background-color: rgba($color-primary-light, 0.05);
+  background-color: $color-bg-page;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.card-container {
+  background: $color-surface;
+  width: 100%;
+  max-width: 700px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  overflow: hidden;
+  border: 1px solid rgba($color-border, 0.5);
+}
+
+.card-header {
+  background: linear-gradient(135deg, $color-primary-dark 0%, $color-primary-light 100%);
+  padding: 32px 40px;
+  color: $color-surface;
+
+  .header-content {
+    h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      margin: 0;
+      font-size: 15px;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+  }
+}
+
+.card-body {
+  padding: 40px;
+}
+
+.form-section {
+  margin-bottom: 32px;
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: $color-primary-dark;
+    margin: 0 0 6px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid rgba($color-primary-light, 0.1);
+  }
+
+  .section-desc {
+    font-size: 14px;
+    color: $color-text-muted;
+    margin: 0 0 20px;
+  }
+}
+
+.input-row {
+  display: flex;
+  gap: 20px;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: $color-text-main;
+    margin-bottom: 6px;
+  }
+
+  .modern-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid $color-border;
+    border-radius: 8px;
+    font-size: 15px;
+    color: $color-text-main;
+    background-color: #fff;
+    transition: all 0.2s ease;
+
+    &::placeholder {
+      color: #94a3b8;
+    }
+
+    &:hover {
+      border-color: $color-border-hover;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary-light;
+      box-shadow: 0 0 0 3px rgba($color-primary-light, 0.15);
+    }
+  }
+}
+
+.validation-msg {
+  font-size: 12px;
+  color: $color-error;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+// Document List UI
+.document-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.document-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border: 1px solid $color-border;
+  border-radius: 8px;
+  background-color: $color-surface;
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: rgba($color-primary-light, 0.1);
+    border-color: $color-primary-light;
+    background-color: rgba($color-primary-light, 0.02);
   }
 
-  .file-label {
+  &.has-file {
+    border-color: rgba($color-primary-green, 0.4);
+    background-color: $color-success-bg;
+  }
+
+  .doc-info {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    color: $color-primary-dark;
+    gap: 4px;
+    padding-right: 16px;
 
-    .upload-icon {
-      margin-bottom: 12px;
-      color: $color-primary-light;
+    .doc-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: $color-text-main;
     }
 
-    .file-text {
-      font-weight: 500;
-      font-size: 16px;
-      color: $color-secondary-blue;
-    }
-  }
-
-  .file-input {
-    display: none;
-  }
-}
-
-.selected-file-info {
-  .file-details {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background-color: rgba($color-primary-light, 0.1);
-    border-radius: 6px;
-    margin-bottom: 24px;
-    border: 1px solid rgba($color-primary-light, 0.3);
-
-    .file-name {
-      font-weight: 500;
+    .doc-name {
+      font-size: 13px;
       color: $color-primary-dark;
+      font-family: monospace;
+      background: rgba($color-primary-dark, 0.06);
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      width: fit-content;
       word-break: break-all;
-      margin-right: 12px;
+    }
+  }
+
+  .doc-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+
+    .hidden-input {
+      display: none;
     }
 
-    .btn-remove {
+    .btn-attach {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background-color: $color-surface;
+      border: 1px solid $color-border-hover;
+      color: $color-text-main;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: $color-primary-light;
+        color: $color-primary-dark;
+        background-color: rgba($color-primary-light, 0.05);
+      }
+
+      svg { opacity: 0.7; }
+    }
+
+    .status-success-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: darken($color-primary-green, 5%);
+
+      svg { color: $color-primary-green; }
+    }
+
+    .btn-icon {
       background: none;
       border: none;
-      color: $color-secondary-red;
+      padding: 6px;
+      border-radius: 50%;
       cursor: pointer;
-      font-size: 18px;
-      padding: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 50%;
-      transition: background-color 0.2s;
+      transition: all 0.2s ease;
+      color: $color-text-muted;
 
-      &:hover {
-        background-color: rgba($color-secondary-red, 0.1);
+      &.btn-remove:hover {
+        background-color: $color-error-bg;
+        color: $color-error;
       }
     }
   }
 }
 
-.form-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+// Alertas / Feedback
+.feedback-area {
+  margin-bottom: 24px;
+  min-height: 48px; // Reserva espacio para evitar saltos en el layout
 }
 
-.form-group {
+.alert {
   display: flex;
-  flex-direction: column;
-
-  label {
-    margin-bottom: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    color: $color-text-dark;
-  }
-
-  .form-control {
-    padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    transition: border-color 0.2s;
-
-    &:focus {
-      outline: none;
-      border-color: $color-primary-light;
-      box-shadow: 0 0 0 2px rgba($color-primary-light, 0.2);
-    }
-  }
-
-  .error-msg {
-    color: $color-secondary-red;
-    font-size: 12px;
-    margin-top: 4px;
-  }
-}
-
-.status-message {
-  padding: 12px;
-  border-radius: 4px;
-  margin-top: 16px;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
   font-size: 14px;
-  text-align: center;
+  font-weight: 500;
 
-  &.success {
-    background-color: rgba($color-primary-green, 0.1);
+  &.alert-success {
+    background-color: $color-success-bg;
     color: darken($color-primary-green, 15%);
-    border: 1px solid rgba($color-primary-green, 0.3);
+    border: 1px solid rgba($color-primary-green, 0.2);
+    svg { color: $color-primary-green; }
   }
 
-  &.error {
-    background-color: rgba($color-secondary-red, 0.1);
-    color: darken($color-secondary-red, 10%);
-    border: 1px solid rgba($color-secondary-red, 0.3);
+  &.alert-error {
+    background-color: $color-error-bg;
+    color: darken($color-error, 10%);
+    border: 1px solid rgba($color-error, 0.2);
+    svg { color: $color-error; }
   }
 }
 
-.form-footer {
-  margin-top: 24px;
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+// Footer y Botón Principal
+.card-footer {
+  padding-top: 24px;
+  border-top: 1px solid $color-border;
   display: flex;
   justify-content: flex-end;
+}
 
-  .btn-submit {
-    background-color: $color-primary-light; // Interactivo Teal Claro
-    color: $color-white;
-    border: none;
-    padding: 10px 24px;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+.btn-primary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: $color-primary-dark;
+  color: $color-surface;
+  border: none;
+  padding: 14px 32px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 200px;
+  box-shadow: 0 4px 6px -1px rgba($color-primary-dark, 0.2);
 
-    &:hover:not([disabled]) {
-      background-color: $color-primary-dark;
-    }
-
-    &:disabled {
-      background-color: #c8c6c4;
-      cursor: not-allowed;
-    }
+  &:hover:not([disabled]) {
+    background-color: lighten($color-primary-dark, 5%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 8px -2px rgba($color-primary-dark, 0.3);
   }
+
+  &:active:not([disabled]) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px -1px rgba($color-primary-dark, 0.2);
+  }
+
+  &:disabled {
+    background-color: $color-border-hover;
+    color: $color-text-muted;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  &.is-loading {
+    background-color: $color-primary-light;
+  }
+
+  .btn-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+// Spinner Animation
+.spinner {
+  animation: rotate 2s linear infinite;
+  width: 20px;
+  height: 20px;
+
+  & .path {
+    stroke: $color-surface;
+    stroke-linecap: round;
+    animation: dash 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes rotate {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes dash {
+  0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+  100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
 }
