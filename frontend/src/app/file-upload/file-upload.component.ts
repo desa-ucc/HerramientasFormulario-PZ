@@ -120,7 +120,7 @@ export class FileUploadComponent implements OnInit {
       this.uploadStatus = 'uploading';
       const { nombre, apellidos } = this.uploadForm.value;
 
-      // Se declara y extrae la extensión del archivo seleccionado
+      // ESTA ES LA LÍNEA CLAVE QUE FALTABA:
       const fileExtension = this.selectedFile.name.split('.').pop() || 'pdf';
 
       this.fileUploadService.uploadSingleFile(

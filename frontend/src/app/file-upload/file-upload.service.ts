@@ -11,11 +11,11 @@ export class FileUploadService {
   /**
    * Envía el archivo y los datos al webhook específico.
    */
-  uploadSingleFile(url: string, file: File, fileKey: string, nombre: string, apellidos: string): Observable<any> {
+  uploadSingleFile(url: string, file: File, fileKey: string, nombre: string, apellidos: string, extension: string): Observable<any> {
     const formData = new FormData();
     formData.append('nombre', nombre);
     formData.append('apellidos', apellidos);
-
+    formData.append('extension', extension); // <- Inyectamos la extensión
     // Adjuntamos el archivo con su clave única requerida por n8n (ej. doc_cedula)
     formData.append(fileKey, file);
 
