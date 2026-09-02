@@ -1,6 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
+
+html,
 body {
     margin: 0;
+    height: 100%;
     font-family: Arial, sans-serif;
-    background-color: #fff; /* Gris claro de fondo tipo SharePoint */
+}
+
+body {
+    background-image:
+        linear-gradient(
+            rgba(0, 0, 0, 0.4), 
+            rgba(0, 0, 0, 0.4)
+        ),
+        url('https://imagen.castrocarazo.ac.cr/images/2026/09/02/b2d70c_d9c8b8fe65a04e42a1e84eb1be6b53c7mv2.png');
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
 }
